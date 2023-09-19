@@ -1,10 +1,10 @@
 import React, {Component} from "react";
-import {FlatList, View, Text, ScrollView, StyleSheet} from 'react-native';
+import {FlatList, View, Text, StyleSheet} from 'react-native';
 import { Card } from 'react-native-elements';
 import { color } from "react-native-elements/dist/helpers";
 import { ListItem, Avatar } from 'react-native-elements';
 import {LEADERS} from '../shared/leaders';
-
+import { ScrollView } from 'react-native-virtualized-view';
 class About extends Component {
   constructor(props) {
     super(props);
