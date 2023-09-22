@@ -1,0 +1,1 @@
+export const baseUrl = 'https://trint.nguyentantria4.repl.co/';

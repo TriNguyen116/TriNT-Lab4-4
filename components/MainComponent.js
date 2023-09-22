@@ -9,7 +9,12 @@ import { createDrawerNavigator, DrawerContentScrollView, DrawerItemList, DrawerI
 import Home from './HomeComponent';
 import Contact from './ContactComponent';
 import About from './AboutComponent';
-
+// redux
+import { connect } from 'react-redux';
+import { fetchLeaders } from '../redux/ActionCreators';
+const mapDispatchToProps = (dispatch) => ({
+  fetchLeaders: () => dispatch(fetchLeaders())
+});
 
 function HomeNavigatorScreen() {
   const HomeNavigator = createStackNavigator();
@@ -142,5 +147,9 @@ class Main extends Component {
       </NavigationContainer>
     );
   }
+  componentDidMount() {
+    // redux
+    this.props.fetchLeaders();
+  }
 }
-export default Main;
+export default connect(null, mapDispatchToProps)(Main);
