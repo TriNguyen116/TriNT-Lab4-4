@@ -9,15 +9,34 @@ import { createDrawerNavigator, DrawerContentScrollView, DrawerItemList, DrawerI
 import Home from './HomeComponent';
 import Contact from './ContactComponent';
 import About from './AboutComponent';
+import { baseUrl } from '../shared/baseUrl';
 // redux
 import { connect } from 'react-redux';
-import { fetchLeaders,fetchDishes, fetchComments } from '../redux/ActionCreators';
+import { fetchLeaders, fetchDishes, fetchComments, fetchPromos } from '../redux/ActionCreators';
 const mapDispatchToProps = (dispatch) => ({
   fetchLeaders: () => dispatch(fetchLeaders()),
   fetchDishes: () => dispatch(fetchDishes()),
-  fetchComments: () => dispatch(fetchComments())
+  fetchComments: () => dispatch(fetchComments()),
+  fetchPromos: () => dispatch(fetchPromos())
 });
-
+function CustomDrawerContent(props) {
+  return (
+    <DrawerContentScrollView {...props}>
+      <View style={{ backgroundColor: '#7cc', height: 80, alignItems: 'center', flexDirection: 'row' }}>
+        <View style={{ flex: 1 }}>
+        <Image source={{ uri: baseUrl + 'images/logo.png' }}  style={{ margin: 10, width: 80, height: 60 }} />
+        </View>
+        <View style={{ flex: 2 }}>
+          <Text style={{ color: '#fff', fontSize: 22, fontWeight: 'bold' }}>TDK & Friends</Text>
+        </View>
+      </View>
+      <DrawerItemList {...props} />
+      <DrawerItem label='Help'
+        icon={({ focused, color, size }) => <Icon name='help' size={size} color={focused ? '#7cc' : '#ccc'} />}
+        onPress={() => Linking.openURL('https://reactnavigation.org/docs/getting-started')} />
+    </DrawerContentScrollView>
+  );  
+}
 function HomeNavigatorScreen() {
   const HomeNavigator = createStackNavigator();
   return (
@@ -94,25 +113,6 @@ function ContactNavigatorScreen() {
   );
 }
 
-function CustomDrawerContent(props) {
-  return (
-    <DrawerContentScrollView {...props}>
-      <View style={{ backgroundColor: '#7cc', height: 80, alignItems: 'center', flexDirection: 'row' }}>
-        <View style={{ flex: 1 }}>
-          <Image source={require('./images/logo.png')} style={{ margin: 10, width: 80, height: 60 }} />
-        </View>
-        <View style={{ flex: 2 }}>
-          <Text style={{ color: '#fff', fontSize: 22, fontWeight: 'bold' }}>TDK & Friends</Text>
-        </View>
-      </View>
-      <DrawerItemList {...props} />
-      <DrawerItem label='Help'
-        icon={({ focused, color, size }) => <Icon name='help' size={size} color={focused ? '#7cc' : '#ccc'} />}
-        onPress={() => Linking.openURL('https://reactnavigation.org/docs/getting-started')} />
-    </DrawerContentScrollView>
-  );
-}
-
 function MainNavigatorScreen() {
   const MainNavigator = createDrawerNavigator();
   return (
@@ -141,6 +141,7 @@ function MainNavigatorScreen() {
   );
 }
 
+
 class Main extends Component {
   render() {
     return (
@@ -154,6 +155,7 @@ class Main extends Component {
     this.props.fetchLeaders();
     this.props.fetchDishes();
     this.props.fetchComments();
+    this.props.fetchPromos();
   }
 }
 export default connect(null, mapDispatchToProps)(Main);
