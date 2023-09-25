@@ -86,3 +86,11 @@ const addPromos = (promos) => ({
   type: ActionTypes.ADD_PROMOS,
   payload: promos
 });
+// favorites
+export const postFavorite = (dishId) => (dispatch) => {
+  dispatch(addFavorite(dishId));
+};
+const addFavorite = (dishId) => ({
+  type: ActionTypes.ADD_FAVORITE,
+  payload: dishId
+});
