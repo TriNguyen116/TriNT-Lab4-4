@@ -6,6 +6,7 @@ import { ListItem, Avatar } from 'react-native-elements';
 import { ScrollView } from 'react-native-virtualized-view';
 //import { LEADERS } from '../shared/leaders';
 import { baseUrl } from '../shared/baseUrl';
+import Loading from './LoadingComponent';
 // redux
 import { connect } from 'react-redux';
 const mapStateToProps = (state) => {
@@ -33,22 +34,41 @@ class RenderHistory extends Component {
     )
   }
 }
-class RenderLeadership extends Component {
-  render() {
-    const { leaders } = this.props; 
 
-    return (
-      <Card>
-        <View style={styles.lineTitle}>
+class RenderLeadership extends Component {
+  
+  render() {
+    if (this.props.isLoading) {
+      return (
+        <Card>
+          <Card.Title>Corporate Leadership</Card.Title>
+          <Card.Divider />
+          <Loading />
+        </Card>
+      );
+    } else if (this.props.errMess) {
+      return (
+        <Card>
+          <Card.Title>Corporate Leadership</Card.Title>
+          <Card.Divider />
+          <Text>{this.props.errMess}</Text>
+        </Card>
+      );
+    } else {
+      return (
+        
+        <Card>
+          <View style={styles.lineTitle}>
           <Text style={styles.title}>Corporate Leadership</Text>
         </View>
         <FlatList
-          data={leaders} 
+          data={this.props.leaders} 
           renderItem={({ item, index }) => this.renderLeaderItem(item, index)}
           keyExtractor={(item) => item.id.toString()}
         />
-      </Card>
-    );
+        </Card>
+      );
+    }
   }
   renderLeaderItem(item, index) {
     return (
@@ -64,20 +84,17 @@ class RenderLeadership extends Component {
 }
 
 class About extends Component {
-  constructor(props) {
-    super(props);
-    /*this.state = {
-      leaders: LEADERS
-    };*/
-  }
   render() {
-    return (
-      <ScrollView>
-        <RenderHistory></RenderHistory>
-        <RenderLeadership leaders={this.props.leaders.leaders}></RenderLeadership>
-      </ScrollView>
+    
+    return(
+    <ScrollView>
+      <RenderHistory></RenderHistory>
+      <RenderLeadership
+      leaders={this.props.leaders.leaders}
+      isLoading={this.props.leaders.isLoading}
+      errMess={this.props.leaders.errMess} />
+    </ScrollView>
     )
-
   }
 }
 
