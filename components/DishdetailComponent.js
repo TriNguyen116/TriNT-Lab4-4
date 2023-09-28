@@ -1,9 +1,7 @@
 import React, { Component } from 'react';
-import { View, Text, FlatList } from 'react-native';
-import { Card, Image, Icon } from 'react-native-elements';
+import { View, Text, FlatList, Modal, Button, StyleSheet,TouchableOpacity, Alert } from 'react-native';
+import { Card, Image, Icon, Rating, Input } from 'react-native-elements';
 import { ScrollView } from 'react-native-virtualized-view';
-/*import { DISHES } from '../shared/dishes';
-import { COMMENTS } from '../shared/comments';*/
 import { baseUrl } from '../shared/baseUrl';
 // redux
 import { connect } from 'react-redux';
@@ -11,7 +9,8 @@ const mapStateToProps = (state) => {
   return {
     dishes: state.dishes,
     comments: state.comments,
-    favorites: state.favorites
+    favorites: state.favorites,
+    comment: state.comment,
   }
 };
 import { postFavorite } from '../redux/ActionCreators';
@@ -19,6 +18,33 @@ const mapDispatchToProps = (dispatch) => ({
   postFavorite: (dishId) => dispatch(postFavorite(dishId))
 });
 
+class ModalContent extends Component {
+  render(){
+    return (
+      <View style={{flex:1, alignItems:'center',marginTop:80}}>
+        <Rating type='star' ratingCount={5} imageSize={40} showRating onFinishRating={this.handleRatingChange} startingValue={this.props.rating}/>
+
+        <Input placeholder='Author' 
+        leftIcon={ <Icon name='person' color='#7cc' size={35} />} 
+        selectedValue={this.props.author} onValueChange={(value) => this.props.setState({ author: value })}/>
+        
+        <Input placeholder='Comment'
+        leftIcon={ <Icon name='chat' color='#7cc' size={35} />} 
+        selectedValue={this.props.comment} onValueChange={(value) => this.props.setState({ comment: value })}/>
+
+        <TouchableOpacity style={styles.submitButton} underlayColor='#fff' 
+          onPress={()=>this.props.handleComment()}>
+          <Text style={styles.buttonText}>SUBMIT</Text>
+         </TouchableOpacity>
+
+         <TouchableOpacity style={styles.closeButton} underlayColor='#fff' onPress={() => this.props.onPressClose()}>
+          <Text style={styles.buttonText}>CLOSE</Text>
+         </TouchableOpacity>
+      </View>
+    )
+  }
+  
+}
 class RenderDish extends Component {
   render() {
     const dish = this.props.dish;
@@ -29,13 +55,17 @@ class RenderDish extends Component {
             <Card.FeaturedTitle>{dish.name}</Card.FeaturedTitle>
           </Image>
           <Text style={{ margin: 10 }}>{dish.description}</Text>
-          <Icon raised reverse type='font-awesome' color='#f50'
-            name={this.props.favorite ? 'heart' : 'heart-o'}
-            onPress={() => this.props.favorite ? alert('Already favorite') : this.props.onPressFavorite()} />
+          <View style={{flexDirection:'row', justifyContent: 'center' }}>
+            <Icon raised reverse type='font-awesome' color='#f50'
+              name={this.props.favorite ? 'heart' : 'heart-o'}
+              onPress={() => this.props.favorite ? alert('Already favorite') : this.props.onPressFavorite()} />
+            <Icon raised reverse type='font-awesome' color='#7cc' name={'pencil'}  onPress={()=>this.props.onPressPencil()} />    
+          </View>
         </Card>
+        
       );
     }
-    return (<View />);
+    return (<View />);     
   }
 }
 
@@ -48,7 +78,7 @@ class RenderComments extends Component {
         <Card.Divider />
         <FlatList data={comments}
           renderItem={({ item, index }) => this.renderCommentItem(item, index)}
-          keyExtractor={(item) => item.id.toString()} />
+          keyExtractor={(item) => item.id.toString()} />   
       </Card>
     );
   }
@@ -56,7 +86,7 @@ class RenderComments extends Component {
     return (
       <View key={index} style={{ margin: 10 }}>
         <Text style={{ fontSize: 14 }}>{item.comment}</Text>
-        <Text style={{ fontSize: 12 }}>{item.rating} Stars</Text>
+        <Rating type='star' ratingCount={5} imageSize={12} startingValue={item.rating} style={{flexDirection:'row', paddingTop:5, paddingBottom:5}}/>
         <Text style={{ fontSize: 12 }}>{'-- ' + item.author + ', ' + item.date} </Text>
       </View>
     );
@@ -66,24 +96,114 @@ class RenderComments extends Component {
 class Dishdetail extends Component {
   constructor(props) {
     super(props);
-    /*this.state = {
-      favorites: []
-    };*/
+    this.state = {
+      // favorites: []
+      showModal: false,
+      rating: 5,
+      author: '',
+      comments: '',
+    };
   }
   render() {
     const dishId = parseInt(this.props.route.params.dishId);
     const dish = this.props.dishes.dishes[dishId];
     const comments = this.props.comments.comments.filter((cmt) => cmt.dishId === dishId);
     const favorite = this.props.favorites.some((el) => el === dishId);
+    const nwcomment = this.props.comment.some((el) => el === dishId);
+    
+
     return (
       <ScrollView>
-        <RenderDish dish={dish} favorite={favorite} onPressFavorite={() => this.markFavorite(dishId)} />
+        <RenderDish dish={dish} favorite={favorite} 
+          onPressFavorite={() => this.markFavorite(dishId)} 
+          onPressPencil={() => this.onPressPencil()}/>
         <RenderComments comments={comments} />
+        <Modal  animationType={'slide'}  visible={this.state.showModal}>
+          <ModalContent
+            nwcomment={nwcomment} 
+           onPressClose={() => this.setState({ showModal: false })}
+           handleComment={()=>this.handleComment()} 
+           rating={this.state.rating}
+           dishId={dishId}
+           author={this.state.author}
+           comment={this.state.comment}
+           handleRatingChange={()=>this.handleRatingChange()}
+           />
+        </Modal>
       </ScrollView>
+      
     );
   }
   markFavorite(dishId) {
     this.props.postFavorite(dishId);
+  }  
+  onPressPencil() {
+    this.setState({ showModal: true });
   }
+  handleComment() {
+    const { dishId } = this.props.route.params;
+    const { rating, author, comment } = this.state;
+  
+    // if (!rating || !author || !comment) {
+    //   Alert.alert('Error', 'Please fill in all fields.');
+    //   return;
+    // }
+  
+    // this.props.postComment(dishId, rating, author, comment);
+  
+    Alert.alert(
+      'Submit Success',
+      '',
+      [
+        {
+          text: 'OK',
+          onPress: () => {
+            this.setState({ showModal: false });
+          },
+        },
+      ],
+    );
+  }
+  
 }
+
+const styles = StyleSheet.create(
+  {
+    submitButton:{
+      marginRight:40,
+      marginLeft:40,
+      marginTop:10,
+      paddingTop:10,
+      paddingBottom:10,
+      backgroundColor:'#7cc',
+      borderRadius:10,
+      borderWidth: 1,
+      borderColor: '#fff',
+      width: 400,
+    },
+
+    closeButton:{
+      marginRight:40,
+      marginLeft:40,
+      marginTop:10,
+      paddingTop:10,
+      paddingBottom:10,
+      backgroundColor:'#909497',
+      borderRadius:10,
+      borderWidth: 1,
+      borderColor: '#fff',
+      width: 400,
+    },
+
+    buttonText:{
+        color:'#fff',
+        textAlign:'center',
+        paddingLeft : 10,
+        paddingRight : 10,
+        fontWeight: '600',
+    }
+  }
+)
+
+
 export default connect(mapStateToProps, mapDispatchToProps)(Dishdetail);

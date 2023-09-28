@@ -9,10 +9,11 @@ import { dishes } from './dishes';
 import { comments } from './comments';
 import { promotions } from './promotions';
 import { favorites } from './favorites';
+import {comment} from './comment';
 
 export const ConfigureStore = () => {
   const store = createStore(
-    combineReducers({ leaders, dishes, comments, promotions, favorites }),
+    combineReducers({ leaders, dishes, comments, promotions, favorites, comment }),
     applyMiddleware(thunk, logger)
   );
   return store;
