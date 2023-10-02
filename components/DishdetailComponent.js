@@ -1,9 +1,8 @@
 import React, { Component } from 'react';
-import { View, Text, FlatList, Modal, Button, StyleSheet,TouchableOpacity, Alert } from 'react-native';
+import { View, Text, FlatList, Modal, Button, StyleSheet,TouchableOpacity, Alert, PanResponder } from 'react-native';
 import { Card, Image, Icon, Rating, Input } from 'react-native-elements';
 import { ScrollView } from 'react-native-virtualized-view';
 import { baseUrl } from '../shared/baseUrl';
-import * as Animatable from 'react-native-animatable';
 // redux
 import { connect } from 'react-redux';
 const mapStateToProps = (state) => {
@@ -46,13 +45,34 @@ class ModalContent extends Component {
   }
   
 }
-
 class RenderDish extends Component {
   render() {
+    // gesture
+    const recognizeDrag = ({ moveX, moveY, dx, dy }) => {
+      if (dx < -200) return 1; // right to left
+      return 0;
+    };
+    const panResponder = PanResponder.create({
+      onStartShouldSetPanResponder: (e, gestureState) => { return true; },
+      onPanResponderEnd: (e, gestureState) => {
+        if (recognizeDrag(gestureState) === 1) {
+          Alert.alert(
+            'Add Favorite',
+            'Are you sure you wish to add ' + dish.name + ' to favorite?',
+            [
+              { text: 'Cancel', onPress: () => { /* nothing */ } },
+              { text: 'OK', onPress: () => { this.props.favorite ? alert('Already favorite') : this.props.onPressFavorite() } },
+            ]
+          );
+        }
+        return true;
+      }
+    });
+    // render
     const dish = this.props.dish;
     if (dish != null) {
       return (
-        <Card>
+        <Card {...panResponder.panHandlers}>
           <Image source={{ uri: baseUrl + dish.image }} style={{ width: '100%', height: 100, flexGrow: 1, alignItems: 'center', justifyContent: 'center' }}>
             <Card.FeaturedTitle>{dish.name}</Card.FeaturedTitle>
           </Image>
@@ -64,10 +84,9 @@ class RenderDish extends Component {
             <Icon raised reverse type='font-awesome' color='#7cc' name={'pencil'}  onPress={()=>this.props.onPressPencil()} />    
           </View>
         </Card>
-        
       );
     }
-    return (<View />);     
+    return (<View />);
   }
 }
 
@@ -112,19 +131,16 @@ class Dishdetail extends Component {
     const comments = this.props.comments.comments.filter((cmt) => cmt.dishId === dishId);
     const favorite = this.props.favorites.some((el) => el === dishId);
     const nwcomment = this.props.comment.some((el) => el === dishId);
+    
+
     return (
       <ScrollView>
-        <Animatable.View animation='fadeInDown' duration={2000} delay={1000}>
-          <RenderDish 
-          dish={dish} favorite={favorite} 
+        <RenderDish dish={dish} favorite={favorite} 
           onPressFavorite={() => this.markFavorite(dishId)} 
           onPressPencil={() => this.onPressPencil()}/>
-        </Animatable.View>
-        <Animatable.View animation='fadeInUp' duration={2000} delay={1000}>
-          <RenderComments comments={comments}/>
-        </Animatable.View>
-        <Modal animationType={'slide'}  visible={this.state.showModal}>
-        <ModalContent
+        <RenderComments comments={comments} />
+        <Modal  animationType={'slide'}  visible={this.state.showModal}>
+          <ModalContent
             nwcomment={nwcomment} 
            onPressClose={() => this.setState({ showModal: false })}
            handleComment={()=>this.handleComment()} 
@@ -136,6 +152,7 @@ class Dishdetail extends Component {
            />
         </Modal>
       </ScrollView>
+      
     );
   }
   markFavorite(dishId) {
@@ -168,7 +185,9 @@ class Dishdetail extends Component {
       ],
     );
   }
+  
 }
+
 const styles = StyleSheet.create(
   {
     submitButton:{
@@ -206,4 +225,6 @@ const styles = StyleSheet.create(
     }
   }
 )
+
+
 export default connect(mapStateToProps, mapDispatchToProps)(Dishdetail);
