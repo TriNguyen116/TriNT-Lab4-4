@@ -7,6 +7,7 @@ import { ScrollView } from 'react-native-virtualized-view';
 //import { LEADERS } from '../shared/leaders';
 import { baseUrl } from '../shared/baseUrl';
 import Loading from './LoadingComponent';
+import * as Animatable from 'react-native-animatable';
 // redux
 import { connect } from 'react-redux';
 const mapStateToProps = (state) => {
@@ -34,7 +35,6 @@ class RenderHistory extends Component {
     )
   }
 }
-
 class RenderLeadership extends Component {
   
   render() {
@@ -82,22 +82,23 @@ class RenderLeadership extends Component {
     );
   }
 }
-
 class About extends Component {
   render() {
-    
-    return(
-    <ScrollView>
-      <RenderHistory></RenderHistory>
-      <RenderLeadership
-      leaders={this.props.leaders.leaders}
-      isLoading={this.props.leaders.isLoading}
-      errMess={this.props.leaders.errMess} />
-    </ScrollView>
-    )
+    return (
+      <ScrollView>
+        <Animatable.View animation='fadeInDown' duration={2000} delay={1000}>
+          <RenderHistory />
+        </Animatable.View>
+        <Animatable.View animation='fadeInUp' duration={2000} delay={1000}>
+          <RenderLeadership 
+          leaders={this.props.leaders.leaders}
+          isLoading={this.props.leaders.isLoading}
+          errMess={this.props.leaders.errMess}/>
+        </Animatable.View>
+      </ScrollView>
+    );
   }
 }
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,

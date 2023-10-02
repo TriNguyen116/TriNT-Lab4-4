@@ -3,6 +3,7 @@ import { View, Text, FlatList, Modal, Button, StyleSheet,TouchableOpacity, Alert
 import { Card, Image, Icon, Rating, Input } from 'react-native-elements';
 import { ScrollView } from 'react-native-virtualized-view';
 import { baseUrl } from '../shared/baseUrl';
+import * as Animatable from 'react-native-animatable';
 // redux
 import { connect } from 'react-redux';
 const mapStateToProps = (state) => {
@@ -45,6 +46,7 @@ class ModalContent extends Component {
   }
   
 }
+
 class RenderDish extends Component {
   render() {
     const dish = this.props.dish;
@@ -110,16 +112,19 @@ class Dishdetail extends Component {
     const comments = this.props.comments.comments.filter((cmt) => cmt.dishId === dishId);
     const favorite = this.props.favorites.some((el) => el === dishId);
     const nwcomment = this.props.comment.some((el) => el === dishId);
-    
-
     return (
       <ScrollView>
-        <RenderDish dish={dish} favorite={favorite} 
+        <Animatable.View animation='fadeInDown' duration={2000} delay={1000}>
+          <RenderDish 
+          dish={dish} favorite={favorite} 
           onPressFavorite={() => this.markFavorite(dishId)} 
           onPressPencil={() => this.onPressPencil()}/>
-        <RenderComments comments={comments} />
-        <Modal  animationType={'slide'}  visible={this.state.showModal}>
-          <ModalContent
+        </Animatable.View>
+        <Animatable.View animation='fadeInUp' duration={2000} delay={1000}>
+          <RenderComments comments={comments}/>
+        </Animatable.View>
+        <Modal animationType={'slide'}  visible={this.state.showModal}>
+        <ModalContent
             nwcomment={nwcomment} 
            onPressClose={() => this.setState({ showModal: false })}
            handleComment={()=>this.handleComment()} 
@@ -131,7 +136,6 @@ class Dishdetail extends Component {
            />
         </Modal>
       </ScrollView>
-      
     );
   }
   markFavorite(dishId) {
@@ -164,9 +168,7 @@ class Dishdetail extends Component {
       ],
     );
   }
-  
 }
-
 const styles = StyleSheet.create(
   {
     submitButton:{
@@ -204,6 +206,4 @@ const styles = StyleSheet.create(
     }
   }
 )
-
-
 export default connect(mapStateToProps, mapDispatchToProps)(Dishdetail);

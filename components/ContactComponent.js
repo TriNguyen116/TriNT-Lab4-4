@@ -2,11 +2,13 @@ import React, {Component} from "react";
 import {View, Text, StyleSheet} from 'react-native';
 import { Card } from 'react-native-elements';
 import { color } from "react-native-elements/dist/helpers";
+import * as Animatable from 'react-native-animatable';
 
 class Contact extends Component {
   render() {
     return (
-      <Card style={styles.card}>
+      <Animatable.View animation='fadeInDown' duration={2000} delay={1000}>
+        <Card style={styles.card}>
           <View style={styles.lineTitle}>
             <Text style={styles.title}>Contact Information</Text>
           </View>
@@ -19,10 +21,10 @@ class Contact extends Component {
             <Text style={styles.text}>Email:confusion@food.net</Text>
           </View>
       </Card>
-    )
+      </Animatable.View>
+    );
   }
 }
-
 const styles = StyleSheet.create({
   lineTitle: {
     borderBottomWidth: 1,
@@ -47,5 +49,4 @@ text: {
   color: 'black',
 }
 })
-
 export default Contact;
