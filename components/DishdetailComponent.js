@@ -132,9 +132,23 @@ class Dishdetail extends Component {
     const favorite = this.props.favorites.some((el) => el === dishId);
     const nwcomment = this.props.comment.some((el) => el === dishId);
     
+    // gesture
+    const detectComment = ({ moveX, moveY, dx, dy }) => {
+      if (dx > 200) return 1; //left to right
+      return 0;
+    };
+    const panResponder = PanResponder.create({
+      onStartShouldSetPanResponder: (e, gestureState) => { return true; },
+      onPanResponderEnd: (e, gestureState) => {
+        if (detectComment(gestureState) === 1) {
+            this.setState({ showModal: true });
+        }
+        return true;
+      }
+    });
 
     return (
-      <ScrollView>
+      <View {...panResponder.panHandlers}>
         <RenderDish dish={dish} favorite={favorite} 
           onPressFavorite={() => this.markFavorite(dishId)} 
           onPressPencil={() => this.onPressPencil()}/>
@@ -151,7 +165,7 @@ class Dishdetail extends Component {
            handleRatingChange={()=>this.handleRatingChange()}
            />
         </Modal>
-      </ScrollView>
+      </View>
       
     );
   }
