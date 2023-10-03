@@ -32,7 +32,7 @@ class Reservation extends Component {
   }
   render() {
     return (
-      <View>
+      <ScrollView>
         <Animatable.View animation="zoomIn" duration={2000} delay={1000}>
         <View style={styles.formRow}>
           <Text style={styles.formLabel}>Number of Guests</Text>
@@ -61,7 +61,7 @@ class Reservation extends Component {
           <Button title='Reserve' color='#7cc' onPress={() => {this.handleReservation()}}/>
         </View>
         </Animatable.View>
-      </View>
+      </ScrollView>
     );
   }
   handleReservation() {
