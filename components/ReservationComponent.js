@@ -32,7 +32,7 @@ class Reservation extends Component {
   }
   render() {
     return (
-      <ScrollView>
+      <View>
         <Animatable.View animation="zoomIn" duration={2000} delay={1000}>
         <View style={styles.formRow}>
           <Text style={styles.formLabel}>Number of Guests</Text>
@@ -61,7 +61,7 @@ class Reservation extends Component {
           <Button title='Reserve' color='#7cc' onPress={() => {this.handleReservation()}}/>
         </View>
         </Animatable.View>
-      </ScrollView>
+      </View>
     );
   }
   handleReservation() {
@@ -78,15 +78,23 @@ class Reservation extends Component {
     [
       {
         text: 'Cancel',
-        onPress: () => {},
+        onPress: () => {this.resetForm()},
       },
       {
         text: 'OK',
-        onPress: () => {},
+        onPress: () => {this.resetForm()},
       },
     ],
   );
 
+  }
+  resetForm() {
+    this.setState({
+      guests: 1,
+      smoking: false,
+      date: new Date(),
+      showDatePicker: false,
+    });
   }
 }
 export default Reservation;

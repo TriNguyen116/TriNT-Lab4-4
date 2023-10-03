@@ -148,7 +148,7 @@ class Dishdetail extends Component {
     });
 
     return (
-      <View {...panResponder.panHandlers}>
+      <ScrollView {...panResponder.panHandlers}>
         <RenderDish dish={dish} favorite={favorite} 
           onPressFavorite={() => this.markFavorite(dishId)} 
           onPressPencil={() => this.onPressPencil()}/>
@@ -165,7 +165,7 @@ class Dishdetail extends Component {
            handleRatingChange={()=>this.handleRatingChange()}
            />
         </Modal>
-      </View>
+      </ScrollView>
       
     );
   }
