@@ -5,6 +5,8 @@ import { Picker } from '@react-native-picker/picker';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import { format } from 'date-fns';
 import * as Animatable from 'react-native-animatable';
+import * as Notifications from 'expo-notifications';
+
 class ModalContent extends Component {
   render() {
     return (
@@ -30,6 +32,7 @@ class Reservation extends Component {
       showModal: false
     }
   }
+
   render() {
     return (
       <ScrollView>
@@ -64,29 +67,43 @@ class Reservation extends Component {
       </ScrollView>
     );
   }
+
   handleReservation() {
     //alert(JSON.stringify(this.state));
     // this.setState({ showModal: true })
     const reservationInfo = `
     Number of Guests: ${this.state.guests}
     Smoking: ${this.state.smoking ? 'Yes' : 'No'}
-    Date and Time: ${format(this.state.date, 'dd/MM/yyyy - HH:mm')}
-  `;
-  Alert.alert(
-    'Your Reservation OK ?',
-    `${reservationInfo}`,
-    [
-      {
-        text: 'Cancel',
-        onPress: () => {this.resetForm()},
-      },
-      {
-        text: 'OK',
-        onPress: () => {this.resetForm()},
-      },
-    ],
-  );
-
+    Date and Time: ${format(this.state.date, 'dd/MM/yyyy - HH:mm')}`;
+    Alert.alert(
+      'Your Reservation OK ?',
+      `${reservationInfo}`,
+      [
+        { text: 'Cancel', 
+          onPress: () => this.resetForm() },
+        { text: 'OK', 
+          onPress: () => {this.presentLocalNotification(this.state.date);
+          this.resetForm();
+        }},
+      ]
+    );
+  }
+  async presentLocalNotification(date) {
+    const { status } = await Notifications.requestPermissionsAsync();
+    if (status === 'granted') {
+      Notifications.setNotificationHandler({
+        handleNotification: async () => ({ shouldShowAlert: true, shouldPlaySound: true, shouldSetBadge: true })
+      });
+      Notifications.scheduleNotificationAsync({
+        content: {
+          title: 'Your Reservation',
+          body: 'Reservation for ' + date + ' requested',
+          sound: true,
+          vibrate: true
+        },
+        trigger: null
+      });
+    }
   }
   resetForm() {
     this.setState({
@@ -97,8 +114,6 @@ class Reservation extends Component {
     });
   }
 }
-export default Reservation;
-
 const styles = StyleSheet.create({
   formRow: { alignItems: 'center', justifyContent: 'center', flex: 1, flexDirection: 'row', margin: 20 },
   formLabel: { fontSize: 18, flex: 2 },
@@ -107,3 +122,5 @@ const styles = StyleSheet.create({
   modalTitle: { fontSize: 24, fontWeight: 'bold', backgroundColor: '#7cc', textAlign: 'center', color: 'white', marginBottom: 20 },
   modalText: { fontSize: 18, margin: 10 }
 });
+
+export default Reservation;

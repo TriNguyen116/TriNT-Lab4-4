@@ -10,6 +10,7 @@ import Home from './HomeComponent';
 import Contact from './ContactComponent';
 import About from './AboutComponent';
 import Reservation from './ReservationComponent';
+import Login from './LoginComponent';
 import { baseUrl } from '../shared/baseUrl';
 // redux
 import { connect } from 'react-redux';
@@ -154,10 +155,33 @@ function FavoritesNavigatorScreen() {
   );
 }
 
+function LoginNavigatorScreen() {
+  const LoginNavigator = createStackNavigator();
+  return (
+    <LoginNavigator.Navigator initialRouteName='Login'
+      screenOptions={{
+        headerStyle: { backgroundColor: '#7cc' },
+        headerTintColor: '#fff',
+        headerTitleStyle: { color: '#fff' }
+      }}>
+      <LoginNavigator.Screen name='Login' component={Login}
+        options={({ navigation }) => ({
+          headerTitle: 'Login',
+          headerLeft: () => (<Icon name='menu' size={36} color='#fff' onPress={() => navigation.toggleDrawer()} />)
+        })} />
+    </LoginNavigator.Navigator>
+  );
+}
+
 function MainNavigatorScreen() {
   const MainNavigator = createDrawerNavigator();
   return (
     <MainNavigator.Navigator initialRouteName='HomeScreen' drawerContent={(props) => <CustomDrawerContent {...props} />}>
+      <MainNavigator.Screen name='LoginScreen' component={LoginNavigatorScreen}
+        options={{
+          title: 'Login', headerShown: false,
+          drawerIcon: ({ focused, size }) => (<Icon name='sign-in' type='font-awesome' size={size} color={focused ? '#7cc' : '#ccc'} />)
+        }} />
       <MainNavigator.Screen name='HomeScreen' component={HomeNavigatorScreen}
         options={{
           title: 'Home', headerShown: false,
