@@ -11,6 +11,8 @@ import Contact from './ContactComponent';
 import About from './AboutComponent';
 import Reservation from './ReservationComponent';
 import Login from './LoginComponent';
+import Register from './RegisterComponent';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { baseUrl } from '../shared/baseUrl';
 // redux
 import { connect } from 'react-redux';
@@ -158,18 +160,36 @@ function FavoritesNavigatorScreen() {
 function LoginNavigatorScreen() {
   const LoginNavigator = createStackNavigator();
   return (
-    <LoginNavigator.Navigator initialRouteName='Login'
+    <LoginNavigator.Navigator initialRouteName='LoginRegister' 
       screenOptions={{
-        headerStyle: { backgroundColor: '#7cc' },
-        headerTintColor: '#fff',
-        headerTitleStyle: { color: '#fff' }
-      }}>
-      <LoginNavigator.Screen name='Login' component={Login}
+      headerStyle: { backgroundColor: '#7cc' },
+      headerTintColor: '#fff',
+      headerTitleStyle: { color: '#fff' }
+    }}>
+      <LoginNavigator.Screen name='LoginRegister' component={TabNavigatorScreen} 
         options={({ navigation }) => ({
-          headerTitle: 'Login',
-          headerLeft: () => (<Icon name='menu' size={36} color='#fff' onPress={() => navigation.toggleDrawer()} />)
-        })} />
+        headerTitle: 'Login',
+        headerLeft: () => (<Icon name='menu' size={36} color='#fff' onPress={() => navigation.toggleDrawer()} />)
+        })}/>
     </LoginNavigator.Navigator>
+  );
+}
+
+function TabNavigatorScreen() {
+  const TabNavigator = createBottomTabNavigator();
+  return (
+    <TabNavigator.Navigator initialRouteName='Login'>
+      <TabNavigator.Screen name='Login' component={Login}
+        options={{
+          headerShown: false,
+          tabBarIcon: ({ color, size }) => (<Icon name='sign-in' type='font-awesome' size={size} color={color} />)
+        }} />
+      <TabNavigator.Screen name='Register' component={Register}
+        options={{
+          headerShown: false,
+          tabBarIcon: ({ color, size }) => (<Icon name='user-plus' type='font-awesome' size={size} color={color} />)
+        }} />
+    </TabNavigator.Navigator>
   );
 }
 
